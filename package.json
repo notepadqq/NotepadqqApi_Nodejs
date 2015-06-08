@@ -1,0 +1,28 @@
+{
+  "name": "notepadqq-api",
+  "version": "0.9.0",
+  "description": "Notepadqq API Layer for extensions",
+  "author": "Daniele Di Sarli <danieleds0@gmail.com>",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/notepadqq/NotepadqqApi_Nodejs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/notepadqq/NotepadqqApi_Nodejs/issues"
+  },
+  "keywords": [
+    "notepadqq"
+  ],
+  "dependencies": {
+    "deasync": "^0.1.0"
+  },
+  "devDependencies": {
+
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": true,
+  "license": "MIT"
+}
