@@ -1,6 +1,6 @@
 {
   "name": "notepadqq-api",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Notepadqq API Layer for extensions",
   "author": "Daniele Di Sarli <danieleds0@gmail.com>",
   "main": "index.js",
