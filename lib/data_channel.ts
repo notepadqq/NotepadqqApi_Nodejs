@@ -6,9 +6,8 @@ class DataChannel {
 	private _buffer = new Buffer(0)
 	private _client
 	
-	constructor(socketPath : string, messageCallback : (message: any) => void) {
-		this._client = net.Socket()
-		this._client.connect(socketPath)
+	constructor(socketPath : string, messageCallback : (message: any) => void, connectedCallback : () => void) {
+		this._client = net.connect(socketPath, connectedCallback)
 		
 		this._client.on('data', function (data : Buffer | string) {
 			let totalData = null;

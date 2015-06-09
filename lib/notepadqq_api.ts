@@ -13,24 +13,53 @@ class NotepadqqApi {
 	
 	private static get NQQ_STUB_ID() { return 1 }
 	
-	constructor(socketPath : string = null, extensionId : string = null) {
+	constructor(connectedCallback : () => void)
+	constructor(socketPath : string, extensionId : string)
+	constructor(socketPath : string, extensionId : string, connectedCallback : () => void)
+	constructor() {
+		let socketPath : string = null
+		let extensionId : string = null
+		let connectedCallback : () => void = null
+		
+		// Handle constructor overloads
+		if (arguments.length == 0) {
+			// Everything is null
+		} else if (arguments.length == 1) {
+			if (typeof arguments[0] === 'function') {
+				connectedCallback = arguments[0]
+			} else throw `Invalid arguments: a function was expected, got ${typeof arguments[0]}`
+		} else if (arguments.length == 2) {
+			socketPath = arguments[0]
+			extensionId = arguments[1]
+		} else if (arguments.length == 3) {
+			socketPath = arguments[0]
+			extensionId = arguments[1]
+			connectedCallback = arguments[2]
+		} else {
+			throw "Invalid number of arguments"
+		}
+		
+		// Get socketPath from argv if not specified
 		if (socketPath === null) {
 			if (process.argv[2] !== undefined)
 				socketPath = process.argv[2]
 			else
 				throw "Socket path not provided"
 		}
+		
+		// Get extensionId from argv if not specified
 		if (extensionId === null) {
 			if (process.argv[3] !== undefined)
 				extensionId = process.argv[3]
 			else
 				throw "Extension id not provided"
 		}
-			
+		
 		this._socketPath = socketPath
 		this._extensionId = extensionId
 		
-		this._dataChannel = new DataChannel(this._socketPath, this._onNewMessage.bind(this))
+		// Connect
+		this._dataChannel = new DataChannel(this._socketPath, this._onNewMessage.bind(this), connectedCallback)
 		this._messageInterpreter = new MessageInterpreter(this._dataChannel)
 		
 		this._nqq = new Stubs.Notepadqq(this._messageInterpreter, NotepadqqApi.NQQ_STUB_ID)
