@@ -13,32 +13,7 @@ class NotepadqqApi {
 	
 	private static get NQQ_STUB_ID() { return 1 }
 	
-	constructor(connectedCallback : () => void)
-	constructor(socketPath : string, extensionId : string)
-	constructor(socketPath : string, extensionId : string, connectedCallback : () => void)
-	constructor() {
-		let socketPath : string = null
-		let extensionId : string = null
-		let connectedCallback : () => void = null
-		
-		// Handle constructor overloads
-		if (arguments.length == 0) {
-			// Everything is null
-		} else if (arguments.length == 1) {
-			if (typeof arguments[0] === 'function') {
-				connectedCallback = arguments[0]
-			} else throw `Invalid arguments: a function was expected, got ${typeof arguments[0]}`
-		} else if (arguments.length == 2) {
-			socketPath = arguments[0]
-			extensionId = arguments[1]
-		} else if (arguments.length == 3) {
-			socketPath = arguments[0]
-			extensionId = arguments[1]
-			connectedCallback = arguments[2]
-		} else {
-			throw "Invalid number of arguments"
-		}
-		
+	constructor(socketPath : string, extensionId : string, connectedCallback : (api: NotepadqqApi) => void) {
 		// Get socketPath from argv if not specified
 		if (socketPath === null) {
 			if (process.argv[2] !== undefined)
@@ -59,10 +34,43 @@ class NotepadqqApi {
 		this._extensionId = extensionId
 		
 		// Connect
-		this._dataChannel = new DataChannel(this._socketPath, this._onNewMessage.bind(this), connectedCallback)
+		this._dataChannel = new DataChannel(this._socketPath, this._onNewMessage.bind(this), function() {
+			// Invoke the callback on the next tick, so we avoid every
+			// possibility to block within Socket's "connectionListener" callback.
+			process.nextTick(() => connectedCallback(this))
+		}.bind(this))
 		this._messageInterpreter = new MessageInterpreter(this._dataChannel)
 		
 		this._nqq = new Stubs.Notepadqq(this._messageInterpreter, NotepadqqApi.NQQ_STUB_ID)
+	}
+	
+	static connect(connectedCallback : () => void) : NotepadqqApi
+	static connect(socketPath : string, extensionId : string) : NotepadqqApi
+	static connect(socketPath : string, extensionId : string, connectedCallback : (api: NotepadqqApi) => void) : NotepadqqApi
+	static connect() : NotepadqqApi {
+		let socketPath : string = null
+		let extensionId : string = null
+		let connectedCallback : (api: NotepadqqApi) => void = null
+		
+		// Handle overloads
+		if (arguments.length == 0) {
+			// Everything is null
+		} else if (arguments.length == 1) {
+			if (typeof arguments[0] === 'function') {
+				connectedCallback = arguments[0]
+			} else throw `Invalid arguments: a function was expected, got ${typeof arguments[0]}`
+		} else if (arguments.length == 2) {
+			socketPath = arguments[0]
+			extensionId = arguments[1]
+		} else if (arguments.length == 3) {
+			socketPath = arguments[0]
+			extensionId = arguments[1]
+			connectedCallback = arguments[2]
+		} else {
+			throw "Invalid number of arguments"
+		}
+		
+		return new NotepadqqApi(socketPath, extensionId, connectedCallback) 
 	}
 	
 	onWindowInitialization(callback) : void {

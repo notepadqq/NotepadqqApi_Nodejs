@@ -11,29 +11,31 @@ API for Notepadqq extensions in Node.js
 
 ```javascript
 // First, require the module
-var NotepadqqApi = require("notepadqq-api")
+var NotepadqqApi = require("notepadqq-api").NotepadqqApi
 
 // Connect to Notepadqq
-var api = new NotepadqqApi.NotepadqqApi();
+NotepadqqApi.connect(function(api) {
 
-// We initialize each window here
-api.onWindowInitialization(function(window) {
+    // Print the version of Notepadqq to the console
+    console.log("Version " + api.notepadqq.version())
 
-	// Print the version of Notepadqq to the console
-	console.log("Version " + api.notepadqq.version())
+    // We initialize each window here
+    api.onWindowInitialization(function(window) {
 
-	// Add a new menu item
-	var menu = window.addExtensionMenuItem(api.extensionId, "My menu")
+        // Add a new menu item
+        var menu = window.addExtensionMenuItem(api.extensionId, "My menu")
 
-	// Add an handler to the "triggered" event of the menu item: it
-	// will be called when the user clicks on the menu.
-	menu.on("triggered", function() {
+        // Add an handler to the "triggered" event of the menu item: it
+        // will be called when the user clicks on the menu.
+        menu.on("triggered", function() {
 
-		// Replace the selected text in the currently opened tab
-		// with the string "Hello World"
-		window.currentEditor().setSelectionsText(["Hello World"]);
+            // Replace the selected text in the currently opened tab
+            // with the string "Hello World"
+            window.currentEditor().setSelectionsText(["Hello World"]);
 
-	});
+        });
+
+    });
 
 });
 ```
