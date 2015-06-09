@@ -13,10 +13,12 @@ class MessageInterpreter {
 	}
 	
 	registerEventHandler(objectId, event : string, callback) {
-		let objEvents = this._setObjectDefault(this._eventHandlers, objectId, {})
-		let evtHandlers = this._setObjectDefault(objEvents, event, [])
-		
-		evtHandlers.push(callback)
+		if (callback !== undefined && callback !== null) {
+			let objEvents = this._setObjectDefault(this._eventHandlers, objectId, {})
+			let evtHandlers = this._setObjectDefault(objEvents, event, [])
+			
+			evtHandlers.push(callback)
+		}
 	}
 	
 	invokeApi(objectId, method : string, args : any[]) {
