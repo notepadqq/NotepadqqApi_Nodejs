@@ -8,14 +8,26 @@ export enum ErrorCode {
 	METHOD_NOT_FOUND = 6
 }
 
-export class MessageError {
+export class MessageError implements Error {
 	
 	private _errorCode : ErrorCode
 	private _errorString : string
 	
+	// Needed for Error
+	public name
+	public message
+	
 	constructor(errorCode : ErrorCode, errorString : string) {
 		this._errorCode = errorCode
 		this._errorString = errorString
+		
+		Error.call(this);
+		if (typeof (<any>Error).captureStackTrace == 'function') {
+			// Specific to V8
+  			(<any>Error).captureStackTrace(this, arguments.callee);
+		}
+		this.name = "MessageError"
+		this.message = this.description()
 	}
 	
 	public get errorCode() {
@@ -45,3 +57,5 @@ export class MessageError {
 	}
 	
 }
+
+(<any>MessageError.prototype).__proto__ = Error.prototype;
